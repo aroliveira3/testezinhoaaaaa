@@ -1,0 +1,56 @@
+<template id="輸入欄位-template">
+    <style>
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+    <div class="input-group">
+        <label id="標籤"></label>
+        <input id="輸入" />
+    </div>
+</template>
+
+<script>
+    class 輸入欄位 extends HTMLElement {
+        constructor() {
+            super();
+            const template = document.getElementById('輸入欄位-template').content;
+            this.attachShadow({ mode: 'open' }).appendChild(template.cloneNode(true));
+        }
+
+        connectedCallback() {
+            const label = this.getAttribute('label') || '';
+            const type = this.getAttribute('type') || 'text';
+            const id = this.getAttribute('id') || '';
+
+            this.shadowRoot.getElementById('標籤').textContent = label;
+            const input = this.shadowRoot.getElementById('輸入');
+            input.type = type;
+            if (id) {
+                input.id = id;
+            }
+        }
+
+        get value() {
+            return this.shadowRoot.getElementById('輸入').value;
+        }
+
+        set value(val) {
+            this.shadowRoot.getElementById('輸入').value = val;
+        }
+    }
+
+    customElements.define('輸入欄位', 輸入欄位);
+</script>

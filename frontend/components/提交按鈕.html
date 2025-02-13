@@ -1,0 +1,30 @@
+<template id="提交按鈕-template">
+    <style>
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+    <button><slot></slot></button>
+</template>
+
+<script>
+    class 提交按鈕 extends HTMLElement {
+        constructor() {
+            super();
+            const template = document.getElementById('提交按鈕-template').content;
+            this.attachShadow({ mode: 'open' }).appendChild(template.cloneNode(true));
+        }
+    }
+
+    customElements.define('提交按鈕', 提交按鈕);
+</script>

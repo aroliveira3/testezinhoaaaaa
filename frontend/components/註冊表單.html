@@ -1,0 +1,113 @@
+<template id="註冊表單-template">
+    <style>
+        .form-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-family: Arial, sans-serif;
+        }
+        .form-title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+    </style>
+    <div class="form-container">
+        <div class="form-title">用戶註冊</div>
+        <輸入欄位 label="姓名" type="text" id="姓名"></輸入欄位>
+        <輸入欄位 label="電郵" type="email" id="電郵"></輸入欄位>
+        <輸入欄位 label="密碼" type="password" id="密碼"></輸入欄位>
+        <輸入欄位 label="確認密碼" type="password" id="確認密碼"></輸入欄位>
+        <提交按鈕>提交</提交按鈕>
+        <訊息></訊息>
+    </div>
+</template>
+
+<script src="輸入欄位.html"></script>
+<script src="提交按鈕.html"></script>
+<script src="訊息.html"></script>
+<script>
+    class 註冊表單 extends HTMLElement {
+        constructor() {
+            super();
+            const template = document.getElementById('註冊表單-template').content;
+            this.attachShadow({ mode: 'open' }).appendChild(template.cloneNode(true));
+        }
+
+        connectedCallback() {
+            const form = this.shadowRoot;
+            const 提交按鈕 = form.querySelector('提交按鈕');
+            const 訊息 = form.querySelector('訊息');
+
+            提交按鈕.addEventListener('click', async () => {
+                const nome = form.querySelector('#姓名').value.trim();
+                const email = form.querySelector('#電郵').value.trim();
+                const senha = form.querySelector('#密碼').value.trim();
+                const confirmarSenha = form.querySelector('#確認密碼').value.trim();
+
+                const erros = [];
+
+                if (!nome) {
+                    erros.push('姓名是必填項目');
+                }
+                if (!email) {
+                    erros.push('電郵是必填項目');
+                } else if (!this.isValidEmail(email)) {
+                    erros.push('電郵格式不正確');
+                }
+                if (!senha) {
+                    erros.push('密碼是必填項目');
+                }
+                if (!confirmarSenha) {
+                    erros.push('確認密碼是必填項目');
+                }
+                if (senha && confirmarSenha && senha !== confirmarSenha) {
+                    erros.push('密碼和確認密碼不一致');
+                }
+
+                if (erros.length > 0) {
+                    訊息.showError(erros.join('<br>'));
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ name: nome, email: email, password: senha, confirmPassword: confirmarSenha })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        訊息.showSuccess(result.message);
+                        form.querySelector('#姓名').value = '';
+                        form.querySelector('#電郵').value = '';
+                        form.querySelector('#密碼').value = '';
+                        form.querySelector('#確認密碼').value = '';
+                    } else {
+                        if (result.errors) {
+                            訊息.showError(result.errors.join('<br>'));
+                        } else {
+                            訊息.showError('發生未知錯誤');
+                        }
+                    }
+                } catch (error) {
+                    訊息.showError('無法連接到伺服器');
+                }
+            });
+        }
+
+        isValidEmail(email) {
+            const re = /^(([^<>()\[\]\\.,;:\s@\"]+(\.[^<>()\[\]\\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\\.,;:\s@\"]+\.)+[^<>()[\]\\.,;:\s@\"]{2,})$/i;
+            return re.test(String(email).toLowerCase());
+        }
+    }
+
+    customElements.define('註冊表單', 註冊表單);
+</script>
