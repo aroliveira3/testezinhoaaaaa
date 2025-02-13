@@ -1,8 +1,0 @@
--- HtmlValidator.elfico
-
-module Utils
-
-function validateHtmlDocument(html: String) -> Boolean
-    -- Implementação fictícia de validação
-    return html.contains("<!DOCTYPE html>") and html.endsWith("</html>")
-end
