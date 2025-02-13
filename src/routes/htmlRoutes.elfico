@@ -1,0 +1,10 @@
+-- htmlRoutes.elfico
+
+module Routes
+
+import Controllers.HtmlDocumentController
+
+function setupRoutes(router)
+    controller = HtmlDocumentController()
+    router.get('/documento-html', controller.createHtmlDocument)
+end
